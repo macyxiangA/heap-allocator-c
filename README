@@ -1,100 +1,94 @@
+# heap-allocator-c
 
-# p3Heap — Custom Heap Memory Allocator in C
+A custom dynamic memory allocator written in C.  
+This project implements a heap allocator with best-fit placement, block splitting, and immediate coalescing, and provides an automated test workflow using Makefiles.
 
-This project implements a custom dynamic memory allocator in C, providing heap initialization, memory allocation, and deallocation with immediate coalescing. The allocator manages a contiguous heap region and uses a best-fit placement strategy to efficiently reuse freed memory blocks.
-
-The implementation focuses on low-level memory management concepts such as alignment, block metadata, splitting, and coalescing, similar to what a simplified malloc/free subsystem would perform internally.
-
----
-
-## Features
-
-- Heap initialization using memory mapping
-- Best-fit allocation policy
-- 8-byte alignment for all payloads
-- Block splitting when allocating from larger free blocks
-- Immediate coalescing with adjacent free blocks on deallocation
-- Explicit block headers and footers for metadata tracking
-- Boundary-tag technique for efficient coalescing
-
----
-
-## Memory Model Overview
-
-Each heap block contains a header storing:
-- Block size (multiple of 8)
-- Allocation status (allocated or free)
-- Status of the previous block
-
-Free blocks additionally contain a footer storing the block size, enabling backward traversal and coalescing.
-
-The heap ends with a special end-mark block used to terminate heap traversal.
-
----
+The allocator exposes a minimal public interface and is designed to be built as a shared library and validated through an extensive test suite.
 
 ## Project Structure
 
-    .
-    ├── p3Heap.c        Heap allocator implementation
-    ├── p3Heap.h        Public allocator interface
-    ├── Makefile        Build rules for shared library
-    ├── tests/          Test programs (not required for core usage)
-    ├── README.md       Project documentation
-    └── .gitignore
+p3Heap.c  
+    Core allocator implementation (heap initialization, allocation, free, coalescing)
 
----
+p3Heap.h  
+    Public interface for the allocator
+
+Makefile  
+    Builds the allocator as a shared object
+
+tests/  
+    Test programs and test Makefile for validating allocator behavior
+
+.gitignore  
+    Ignores build artifacts and editor files
+
+README.md  
+    Project documentation
+
+## Allocator Features
+
+- Best-fit allocation strategy
+- Block size alignment to 8 bytes
+- Block splitting when excess space is available
+- Immediate coalescing with adjacent free blocks
+- Footer-based free block tracking
+- Shared library build for external testing
 
 ## Build Instructions
 
-To compile the allocator into a shared library:
+From the project root directory, build the allocator shared library:
 
     make p3Heap
 
 This produces:
 
-- p3Heap.o
-- libheap.so
+    p3Heap.o
+    libheap.so
 
----
+## Running Tests
 
-## Usage
+Change into the tests directory:
 
-Initialize the heap before performing any allocations:
+    cd tests
 
-    init_heap(4096);
+Build all test executables:
 
-Allocate memory:
+    make
 
-    void *ptr = alloc(64);
+Run allocation-only tests:
 
-Free allocated memory:
+    make partA
 
-    free_block(ptr);
+Run allocation and free tests (no coalescing):
 
-Optional debugging output to visualize heap layout:
+    make partB
 
-    disp_heap();
+Run tests requiring immediate coalescing:
 
----
+    make partC
 
-## Design Notes
+Run advanced coalescing tests:
 
-- Allocation uses a best-fit search to reduce fragmentation
-- Freeing a block immediately attempts to coalesce with neighboring free blocks
-- Pointer validity and alignment are strictly checked during deallocation
-- The allocator does not rely on the system malloc/free internally
+    make partD
 
----
+## Memory Checking
 
-## Limitations
+To check for memory errors using valgrind:
 
-- The heap must be initialized exactly once
-- The allocator manages a single contiguous heap region
-- Thread safety is not provided
-- Only basic allocation semantics are supported
+    make memcheck
 
----
+You may also run valgrind on individual test binaries.
 
-## License
+## Cleaning Build Artifacts
 
-This project is provided for educational and demonstration purposes.
+Remove all generated binaries and object files:
+
+    make clean
+
+## Notes
+
+- This repository contains only implementation code and test drivers.
+- Generated binaries and shared objects are excluded via .gitignore.
+- The allocator is designed to be tested through the provided test harness and Makefiles.
+- The README is written to be portable and stable across GitHub, VS Code, and Markdown editors.
+
