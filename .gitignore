@@ -3,7 +3,7 @@
 *.so
 
 # executables
-test*
+tests/test*
 check_*
 a.out
 
