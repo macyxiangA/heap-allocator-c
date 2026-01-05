@@ -1,0 +1,100 @@
+
+# p3Heap — Custom Heap Memory Allocator in C
+
+This project implements a custom dynamic memory allocator in C, providing heap initialization, memory allocation, and deallocation with immediate coalescing. The allocator manages a contiguous heap region and uses a best-fit placement strategy to efficiently reuse freed memory blocks.
+
+The implementation focuses on low-level memory management concepts such as alignment, block metadata, splitting, and coalescing, similar to what a simplified malloc/free subsystem would perform internally.
+
+---
+
+## Features
+
+- Heap initialization using memory mapping
+- Best-fit allocation policy
+- 8-byte alignment for all payloads
+- Block splitting when allocating from larger free blocks
+- Immediate coalescing with adjacent free blocks on deallocation
+- Explicit block headers and footers for metadata tracking
+- Boundary-tag technique for efficient coalescing
+
+---
+
+## Memory Model Overview
+
+Each heap block contains a header storing:
+- Block size (multiple of 8)
+- Allocation status (allocated or free)
+- Status of the previous block
+
+Free blocks additionally contain a footer storing the block size, enabling backward traversal and coalescing.
+
+The heap ends with a special end-mark block used to terminate heap traversal.
+
+---
+
+## Project Structure
+
+    .
+    ├── p3Heap.c        Heap allocator implementation
+    ├── p3Heap.h        Public allocator interface
+    ├── Makefile        Build rules for shared library
+    ├── tests/          Test programs (not required for core usage)
+    ├── README.md       Project documentation
+    └── .gitignore
+
+---
+
+## Build Instructions
+
+To compile the allocator into a shared library:
+
+    make p3Heap
+
+This produces:
+
+- p3Heap.o
+- libheap.so
+
+---
+
+## Usage
+
+Initialize the heap before performing any allocations:
+
+    init_heap(4096);
+
+Allocate memory:
+
+    void *ptr = alloc(64);
+
+Free allocated memory:
+
+    free_block(ptr);
+
+Optional debugging output to visualize heap layout:
+
+    disp_heap();
+
+---
+
+## Design Notes
+
+- Allocation uses a best-fit search to reduce fragmentation
+- Freeing a block immediately attempts to coalesce with neighboring free blocks
+- Pointer validity and alignment are strictly checked during deallocation
+- The allocator does not rely on the system malloc/free internally
+
+---
+
+## Limitations
+
+- The heap must be initialized exactly once
+- The allocator manages a single contiguous heap region
+- Thread safety is not provided
+- Only basic allocation semantics are supported
+
+---
+
+## License
+
+This project is provided for educational and demonstration purposes.
