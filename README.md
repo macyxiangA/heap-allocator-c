@@ -47,28 +47,15 @@ This produces:
 
 ## Running Tests
 
-Change into the tests directory:
+From the project root, build and run the allocator tests:
+
+    make test
+
+You can also run individual groups from `tests/`:
 
     cd tests
-
-Build all test executables:
-
-    make
-
-Run allocation-only tests:
-
     make partA
-
-Run allocation and free tests (no coalescing):
-
-    make partB
-
-Run tests requiring immediate coalescing:
-
     make partC
-
-Run advanced coalescing tests:
-
     make partD
 
 ## Memory Checking
@@ -91,4 +78,3 @@ Remove all generated binaries and object files:
 - Generated binaries and shared objects are excluded via .gitignore.
 - The allocator is designed to be tested through the provided test harness and Makefiles.
 - The README is written to be portable and stable across GitHub, VS Code, and Markdown editors.
-
